@@ -10,8 +10,9 @@ def get_esp_data(request):
     if request.method == "POST":
         data = json.loads(request.body)
         distance = data["distance"]
+        device_id = data.get("device_id", "esp32_1")
 
-        event = SensorEvent(distance_value=distance)
+        event = SensorEvent(distance_value=distance, device_id=device_id)
         event.save()
         return JsonResponse({"status": "ok"})
     
@@ -24,7 +25,8 @@ def export_data(request):
 
     for event in events:
         results.append({"id": event.id, 
-                        "time": event.response_time.isoformat(),
+                        "device_id": event.device_id,
+                        "time": event.response_time.strftime("%Y-%m-%d %H:%M:%S"),
                         "distance": event.distance_value})
 
     return JsonResponse(results, safe=False)
