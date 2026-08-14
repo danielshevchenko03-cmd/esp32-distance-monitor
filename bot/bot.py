@@ -22,10 +22,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Hello!")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = """"*/start* - почати роботу з ботом
-    */help* - список команд
-    */get_data* - отримати CSV з даними сенсора
-    */stats* - статистика сенсора"""
+    text = """*/start* - почати роботу з ботом
+*/help* - список команд
+*/get_data* - отримати CSV з даними сенсора
+*/stats* - статистика сенсора"""
     await update.message.reply_text(text, parse_mode="Markdown")
 
 async def post_init(application):
@@ -45,7 +45,7 @@ async def get_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = response.json()
 
         file = io.StringIO()
-        fieldnames = ['id', 'device_id', 'time', 'distance']
+        fieldnames = ['id', 'device_id', 'time', 'distance (mm)']
         writer = csv.DictWriter(file, fieldnames=fieldnames)
 
         writer.writeheader()
@@ -55,7 +55,9 @@ async def get_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
         document_file = io.BytesIO(csv_data)
         document_file.name = "events.csv"
 
-        await update.message.reply_document(document=document_file, caption="")
+        total_count = len(data)
+        caption_text = f"Звіт з {total_count} подій"
+        await update.message.reply_document(document=document_file, caption=caption_text)
 
     except requests.RequestException:
         await update.message.reply_text("⚠️ Сервер бекенду тимчасово недоступний ⚠️")
