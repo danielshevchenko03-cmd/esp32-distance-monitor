@@ -45,7 +45,7 @@ async def get_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = response.json()
 
         file = io.StringIO()
-        fieldnames = ['id', 'device_id', 'time', 'distance (mm)']
+        fieldnames = ['id', 'device_id', 'time', 'distance']
         writer = csv.DictWriter(file, fieldnames=fieldnames)
 
         writer.writeheader()
