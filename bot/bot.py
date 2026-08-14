@@ -11,6 +11,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 load_dotenv()
 
 TOKEN = os.getenv("TG_BOT_TOKEN")
+API_URL = os.getenv("DJANGO_API_URL")
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -33,7 +34,7 @@ async def post_init(application):
 
 async def get_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        response = requests.get("http://127.0.0.1:8000/api/events/")
+        response = requests.get(API_URL)
         response.raise_for_status()
 
         data = response.json()

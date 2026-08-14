@@ -1,6 +1,7 @@
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import localtime
 
 from .models import SensorEvent
 
@@ -26,7 +27,7 @@ def export_data(request):
     for event in events:
         results.append({"id": event.id, 
                         "device_id": event.device_id,
-                        "time": event.response_time.strftime("%Y-%m-%d %H:%M:%S"),
+                        "time": localtime(event.response_time).strftime("%Y-%m-%d %H:%M:%S"),
                         "distance": event.distance_value})
 
     return JsonResponse(results, safe=False)
