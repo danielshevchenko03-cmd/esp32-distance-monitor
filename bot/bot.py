@@ -13,6 +13,8 @@ load_dotenv()
 TOKEN = os.getenv("TG_BOT_TOKEN")
 API_URL = os.getenv("DJANGO_API_URL")
 
+logger = logging.getLogger("sensor_bot")
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
@@ -57,12 +59,15 @@ async def get_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         total_count = len(data)
         caption_text = f"Звіт з {total_count} подій"
+        logger.info(f"Сформовано звіт: {total_count} подій") # logger logic
         await update.message.reply_document(document=document_file, caption=caption_text)
 
     except requests.RequestException:
+        logger.warning("Backend недоступний")
         await update.message.reply_text("⚠️ Сервер бекенду тимчасово недоступний ⚠️")
 
     except Exception as error:
+        logger.warning(f"Помилка при формуванні звіту {error}") # logger logic
         await update.message.reply_text("Виникла помилка при формуванні звіту")
 
 async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -96,5 +101,5 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("get_data", get_data))
     app.add_handler(CommandHandler("stats", stats))
 
-    print("🤖 Bot launched!")
+    logger.info("🤖 Bot launched!")
     app.run_polling()

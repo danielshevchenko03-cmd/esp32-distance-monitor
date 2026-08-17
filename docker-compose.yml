@@ -1,6 +1,12 @@
+name: esp32-monitoring
+
 services:
   db:
     image: postgres:16
+    container_name: db-postgres
+    labels:
+      - dockmon.enable=true
+      - dockmon.tag=db-tier, critical
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -12,8 +18,12 @@ services:
   
   web:
     build: ./backend
+    container_name: django-server
     depends_on:
       - db
+    labels:
+      - dockmon.enable=true
+      - dockmon.tag=web-tier, internal
     environment:
       DEBUG: ${DEBUG}
       SECRET_KEY: ${SECRET_KEY}
@@ -27,8 +37,12 @@ services:
 
   bot:
     build: ./bot
+    container_name: telegram-bot
     depends_on:
       - web
+    labels:
+      - dockmon.enable=true
+      - dockmon.tag=app-tier, customer-facing
     environment:
       TG_BOT_TOKEN: ${TG_BOT_TOKEN}
       DJANGO_API_URL: http://web:8000/api/events/
@@ -41,6 +55,7 @@ services:
       - "8001:443"
     environment:
       - TZ=Europe/Kyiv
+      - DOCKMON_FILTER_BY_LABEL=true
     volumes:
       - dockmon_data:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
