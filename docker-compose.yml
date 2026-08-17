@@ -33,5 +33,18 @@ services:
       TG_BOT_TOKEN: ${TG_BOT_TOKEN}
       DJANGO_API_URL: http://web:8000/api/events/
 
+  dockmon:
+    image: darthnorse/dockmon:latest
+    container_name: dockmon
+    restart: unless-stopped
+    ports:
+      - "8001:443"
+    environment:
+      - TZ=Europe/Kyiv
+    volumes:
+      - dockmon_data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+
 volumes:
   postgres_data:
+  dockmon_data:
